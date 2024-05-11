@@ -66,7 +66,7 @@ function placeBlock(blockpos) {
             if (sleeptick != 0) {sleeptick -=1;return}
             sleeptick = Math.floor(rand(module.getSetting("Placedelay")[0],module.getSetting("Placedelay")[1]))
         } else {
-            if (rand(0,rand(firstPlacedelay, secondPlacedelay)) > 0.1) return
+            if (rand(0,rand(module.getSetting("Placedelay")[0], module.getSetting("Placedelay")[1])) > 0.1) return
         }
     }
     if (blockpos == null){
@@ -78,8 +78,6 @@ function placeBlock(blockpos) {
     if (module.getSetting("Swing")) player.swingItem()
 }
 
-var firstPlacedelay = module.getSetting("Placedelay")[0]
-var secondPlacedelay = module.getSetting("Placedelay")[1]
 var surroundedBlocks = 0
 var topBlock = false
  patch-1
@@ -90,6 +88,10 @@ var sleeptick = Math.floor(rand(module.getSetting("Placedelay")[0],module.getSet
 var startPos = null
  master
 module.handle("onTick", function(e) {
+
+var firstPlacedelay = module.getSetting("Placedelay")[0]
+var secondPlacedelay = module.getSetting("Placedelay")[1]
+	
     if (module.getSetting("Delay")){
         module.setSettingVisibility("Placedelay",true)
         module.setSettingVisibility("Delay Mode(when to return)",true)
