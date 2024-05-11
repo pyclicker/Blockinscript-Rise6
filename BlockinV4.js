@@ -37,28 +37,34 @@ script.handle("onUnload", function () {
 function rand(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-function drawblock(blockpos,color) {
+function drawblock(blockpos,color,color_side) {
 	x = blockpos.getPosition().x
 	y = blockpos.getPosition().y
 	z = blockpos.getPosition().z
-
+	width = 5
 	//bottom
-	render.drawLine3D(x,y,z,x+1,y,z,color,2)
-	render.drawLine3D(x+1,y,z,x+1,y,z+1,color,2)
-	render.drawLine3D(x+1,y,z+1,x,y,z+1,color,2)
-	render.drawLine3D(x,y,z+1,x,y,z,color,2)
+	render.drawLine3D(x,y,z,x+1,y,z,color,width)
+	render.drawLine3D(x+1,y,z,x+1,y,z+1,color,width)
+	render.drawLine3D(x+1,y,z+1,x,y,z+1,color,width)
+	render.drawLine3D(x,y,z+1,x,y,z,color,width)
 	
 	//top
-	render.drawLine3D(x,y+1,z,x+1,y+1,z,color,2)
-	render.drawLine3D(x+1,y+1,z,x+1,y+1,z+1,color,2)
-	render.drawLine3D(x+1,y+1,z+1,x,y+1,z+1,color,2)
-	render.drawLine3D(x,y+1,z+1,x,y+1,z,color,2)
+	render.drawLine3D(x,y+1,z,x+1,y+1,z,color,width)
+	render.drawLine3D(x+1,y+1,z,x+1,y+1,z+1,color,width)
+	render.drawLine3D(x+1,y+1,z+1,x,y+1,z+1,color,width)
+	render.drawLine3D(x,y+1,z+1,x,y+1,z,color,width)
 
 	//connect top with bottom
-	render.drawLine3D(x,y+1,z,x,y,z,color,2)
-	render.drawLine3D(x+1,y+1,z,x+1,y,z,color,2)
-	render.drawLine3D(x+1,y+1,z+1,x+1,y,z+1,color,2)
-	render.drawLine3D(x,y+1,z+1,x,y,z+1,color,2)
+	render.drawLine3D(x,y+1,z,x,y,z,color,width)
+	render.drawLine3D(x+1,y+1,z,x+1,y,z,color,width)
+	render.drawLine3D(x+1,y+1,z+1,x+1,y,z+1,color,width)
+	render.drawLine3D(x,y+1,z+1,x,y,z+1,color,width)
+
+	//creating diagonals
+	render.drawLine3D(x,y+1,z,x+1,y,z,color_side,width)
+	render.drawLine3D(x+1,y+1,z,x+1,y,z+1,color_side,width)
+	render.drawLine3D(x+1,y,z+1,x,y+1,z+1,color_side,width)
+	render.drawLine3D(x+1,y+1,z,x+1,y,z+1,color_side,width)
 }
 function placeBlock(blockpos) {
 	if (module.getSetting("Delay")&&module.getSetting("Delay Mode(when to return)") == "BeforePlace"){
@@ -217,9 +223,9 @@ module.handle("onRender3D", function(e) {
 	}
 	var topBlocks = [world.newBlockPos(x+1,y+2,z),world.newBlockPos(x,y+2,z)]
 	for (i = 0;i < surroundings.length;i++){
-		if (surroundings[i].getBlock().getId() == 0) drawblock(surroundings[i],[((surroundings[i].getPosition().y-y)/5)*255,255,((surroundings[i].getPosition().y-y)/5)*255])
+		if (surroundings[i].getBlock().getId() == 0) drawblock(surroundings[i],[255/(surroundings[i].getPosition().y-y),255,255/(surroundings[i].getPosition().y-y)],[255,255/(surroundings[i].getPosition().y-y),255/(surroundings[i].getPosition().y-y)])
 	}
 	for (i = 0;i < topBlocks.length;i++){
-		if (topBlocks[i].getBlock().getId() == 0) drawblock(topBlocks[i],[((topBlocks[i].getPosition().y-y)/5)*255,255,((topBlocks[i].getPosition().y-y)/5)*255])
+		if (topBlocks[i].getBlock().getId() == 0) drawblock(topBlocks[i],[255/(topBlocks[i].getPosition().y-y),255,255/(topBlocks[i].getPosition().y-y)],[255,255/(topBlocks[i].getPosition().y-y),255/(topBlocks[i].getPosition().y-y)])
 	}
 })
