@@ -20,6 +20,7 @@ module.registerSetting("boolean", "Sneak", true)
 module.registerSetting("boolean", "Jump", true)
 module.registerSetting("boolean", "Top", true)
 module.registerSetting("boolean", "Use rightClick function (most legit)", false)
+module.registerSetting("boolean", "Render", true)
 module.registerSetting("boolean", "Auto-Disable", false)
 
 ///------------------------------------------------------\\\
@@ -36,11 +37,10 @@ script.handle("onUnload", function () {
 function rand(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-function drawblock(blockpos) {
+function drawblock(blockpos,color) {
 	x = blockpos.getPosition().x
 	y = blockpos.getPosition().y
 	z = blockpos.getPosition().z
-	color = [255,255,255]
 
 	//bottom
 	render.drawLine3D(x,y,z,x+1,y,z,color,2)
@@ -200,7 +200,7 @@ module.handle("onTick", function(e) {
 })
 
 module.handle("onRender3D", function(e) {
-	if (!startPos) return
+	if (!startPos || !module.getSetting("Render")) return
 	var x = Math.floor(startPos.x)
 	var y = Math.floor(startPos.y)
 	var z = Math.floor(startPos.z)
@@ -217,9 +217,9 @@ module.handle("onRender3D", function(e) {
 	}
 	var topBlocks = [world.newBlockPos(x+1,y+2,z),world.newBlockPos(x,y+2,z)]
 	for (i = 0;i < surroundings.length;i++){
-		if (surroundings[i].getBlock().getId() == 0) drawblock(surroundings[i])
+		if (surroundings[i].getBlock().getId() == 0) drawblock(surroundings[i],[((surroundings[i].getPosition().y-y)/5)*255,255,((surroundings[i].getPosition().y-y)/5)*255])
 	}
 	for (i = 0;i < topBlocks.length;i++){
-		if (topBlocks[i].getBlock().getId() == 0) drawblock(topBlocks[i])
+		if (topBlocks[i].getBlock().getId() == 0) drawblock(topBlocks[i],[((topBlocks[i].getPosition().y-y)/5)*255,255,((topBlocks[i].getPosition().y-y)/5)*255])
 	}
 })
