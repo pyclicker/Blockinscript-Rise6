@@ -36,7 +36,30 @@ script.handle("onUnload", function () {
 function rand(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+function drawblock(blockpos) {
+	x = blockpos.getPosition().x
+	y = blockpos.getPosition().y
+	z = blockpos.getPosition().z
+	color = [255,255,255]
 
+	//bottom
+	render.drawLine3D(x,y,z,x+1,y,z,color,2)
+	render.drawLine3D(x+1,y,z,x+1,y,z+1,color,2)
+	render.drawLine3D(x+1,y,z+1,x,y,z+1,color,2)
+	render.drawLine3D(x,y,z+1,x,y,z,color,2)
+	
+	//top
+	render.drawLine3D(x,y+1,z,x+1,y+1,z,color,2)
+	render.drawLine3D(x+1,y+1,z,x+1,y+1,z+1,color,2)
+	render.drawLine3D(x+1,y+1,z+1,x,y+1,z+1,color,2)
+	render.drawLine3D(x,y+1,z+1,x,y+1,z,color,2)
+
+	//connect top with bottom
+	render.drawLine3D(x,y+1,z,x,y,z,color,2)
+	render.drawLine3D(x+1,y+1,z,x+1,y,z,color,2)
+	render.drawLine3D(x+1,y+1,z+1,x+1,y,z+1,color,2)
+	render.drawLine3D(x,y+1,z+1,x,y,z+1,color,2)
+}
 function placeBlock(blockpos) {
     if (module.getSetting("Delay")&&module.getSetting("Delay Mode(when to return)") == "BeforePlace"){
         if (!module.getSetting("Random")){
@@ -59,9 +82,13 @@ var firstPlacedelay = module.getSetting("Placedelay")[0]
 var secondPlacedelay = module.getSetting("Placedelay")[1]
 var surroundedBlocks = 0
 var topBlock = false
+ patch-1
 var startPos = null
-var sleeptick = Math.floor(rand(firstPlacedelay, secondPlacedelay))
+var sleeptick = Math.floor(rand(module.getSetting("Placedelay")[0],module.getSetting("Placedelay")[1]))
 
+var sleeptick = Math.floor(rand(module.getSetting("Placedelay")[0],module.getSetting("Placedelay")[1]))
+var startPos = null
+ master
 module.handle("onTick", function(e) {
     if (module.getSetting("Delay")){
         module.setSettingVisibility("Placedelay",true)
@@ -177,4 +204,29 @@ module.handle("onTick", function(e) {
         }
     }
     if (module.getSetting("Auto-Disable")) module.setEnabled(false)
+})
+
+module.handle("onRender3D", function(e) {
+	if (!startPos) return
+	var x = Math.floor(startPos.x)
+	var y = Math.floor(startPos.y)
+	var z = Math.floor(startPos.z)
+	switch (module.getSetting("Mode")){
+		case "side-first":
+			surroundings = [world.newBlockPos(x+1,y,z),world.newBlockPos(x+1,y+1,z), world.newBlockPos(x,y,z+1),world.newBlockPos(x,y+1,z+1), world.newBlockPos(x-1,y,z),world.newBlockPos(x-1,y+1,z), world.newBlockPos(x,y,z-1),world.newBlockPos(x,y+1,z-1)]	
+		break;
+		case "bottom-first":
+			surroundings = [world.newBlockPos(x+1,y,z), world.newBlockPos(x,y,z+1), world.newBlockPos(x-1,y,z), world.newBlockPos(x,y,z-1),world.newBlockPos(x+1,y+1,z), world.newBlockPos(x,y+1,z+1), world.newBlockPos(x-1,y+1,z), world.newBlockPos(x,y+1,z-1)]
+		break;
+		case "no-middle":
+			surroundings = [world.newBlockPos(x+1,y,z),world.newBlockPos(x,y,z+1),world.newBlockPos(x-1,y,z),world.newBlockPos(x,y,z-1),world.newBlockPos(x+1,y+1,z)]
+		break;
+	}
+	var topBlocks = [world.newBlockPos(x+1,y+2,z),world.newBlockPos(x,y+2,z)]
+	for (i = 0;i < surroundings.length;i++){
+		if (surroundings[i].getBlock().getId() == 0) drawblock(surroundings[i])
+	}
+	for (i = 0;i < topBlocks.length;i++){
+		if (topBlocks[i].getBlock().getId() == 0) drawblock(topBlocks[i])
+	}
 })
